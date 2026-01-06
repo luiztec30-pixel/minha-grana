@@ -156,7 +156,14 @@ export function FixedExpensesView() {
                 key={expense.id} 
                 className="group flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all"
               >
-                <div className="font-medium text-slate-700 dark:text-slate-200">{expense.name}</div>
+                <div className="flex items-center gap-2">
+                  <div className="font-medium text-slate-700 dark:text-slate-200">{expense.name}</div>
+                  {(expense as any).originId && (
+                    <div className="flex items-center gap-1 text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                      Variável
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-slate-900 dark:text-white mr-2">
                     R$ {Number(expense.amount).toFixed(2)}

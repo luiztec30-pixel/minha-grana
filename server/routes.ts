@@ -166,16 +166,17 @@ export async function registerRoutes(
   });
 
   // Seed Data
-  const incomes = await storage.getIncomes();
-  if (incomes.length === 0) {
+  const incomesData = await storage.getIncomes();
+  if (incomesData.length === 0) {
     const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     for (const month of months) {
       await storage.createIncome({ 
         month, 
-        clt: "0", 
-        app: "0", 
-        ifood: "246", // Default as per user
-        auxilio: "120" // Default as per user
+        name: "Principal",
+        data: {
+          ifood: "246", // Default as per user
+          auxilio: "120" // Default as per user
+        }
       });
     }
 
