@@ -208,16 +208,16 @@ export function VariableExpensesView() {
                               size="icon"
                               className={clsx(
                                 "w-8 h-8 transition-colors",
-                                (expense as any).isSynced ? "text-emerald-500 cursor-default" : "text-muted-foreground hover:text-emerald-500"
+                                (expense as any).isSynced ? "text-emerald-500" : "text-muted-foreground hover:text-emerald-500"
                               )}
-                              onClick={() => !(expense as any).isSynced && syncMutation.mutate(expense.id)}
-                              disabled={(expense as any).isSynced || syncMutation.isPending}
+                              onClick={() => syncMutation.mutate(expense.id)}
+                              disabled={syncMutation.isPending}
                             >
                               <ArrowUpRight className="w-4 h-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {(expense as any).isSynced ? "Já sincronizado com Gastos Fixos" : "Enviar para Gastos Fixos"}
+                            {(expense as any).isSynced ? "Atualizar em Gastos Fixos" : "Enviar para Gastos Fixos"}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

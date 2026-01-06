@@ -103,16 +103,30 @@ export class DatabaseStorage implements IStorage {
 
   async syncVariableToFixed(variableId: number): Promise<void> {
     const [expense] = await db.select().from(variableExpenses).where(eq(variableExpenses.id, variableId));
-    if (!expense || expense.isSynced) return;
+    if (!expense) return;
 
     await db.transaction(async (tx) => {
-      // Create the fixed expense
-      await tx.insert(fixedExpenses).values({
-        month: expense.month,
-        name: expense.description,
-        amount: expense.amount,
-        originId: expense.id,
-      });
+      // Check if already synced
+      const [existingFixed] = await tx.select().from(fixedExpenses).where(eq(fixedExpenses.originId, variableId));
+      
+      if (existingFixed) {
+        // Update existing fixed expense
+        await tx.update(fixedExpenses)
+          .set({
+            name: expense.description,
+            amount: expense.amount,
+            month: expense.month,
+          })
+          .where(eq(fixedExpenses.originId, variableId));
+      } else {
+        // Create new fixed expense
+        await tx.insert(fixedExpenses).values({
+          month: expense.month,
+          name: expense.description,
+          amount: expense.amount,
+          originId: expense.id,
+        });
+      }
 
       // Mark variable as synced
       await tx.update(variableExpenses)
