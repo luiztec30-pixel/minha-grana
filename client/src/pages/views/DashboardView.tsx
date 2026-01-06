@@ -28,7 +28,7 @@ export function DashboardView() {
   // Helper to get total fixed expenses for a specific month
   const getFixedForMonth = (monthName: string) => {
     return fixedExpenses
-      .filter(f => f.month === monthName)
+      .filter(f => f.month === monthName && !(f as any).originId)
       .reduce((sum, item) => sum + Number(item.amount), 0);
   };
 
