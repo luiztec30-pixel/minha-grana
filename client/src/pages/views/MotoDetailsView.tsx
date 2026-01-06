@@ -49,6 +49,32 @@ export function MotoDetailsView() {
 
   const watchedValues = form.watch();
   
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'totalValue' || name === 'entry' || name === 'interestRate' || name === 'totalInstallments') {
+        const total = Number(value.totalValue || 0);
+        const entry = Number(value.entry || 0);
+        const rate = Number(value.interestRate || 0) / 100;
+        const months = Number(value.totalInstallments || 1);
+        
+        const financedAmount = total - entry;
+        
+        if (financedAmount > 0 && months > 0) {
+          let installment;
+          if (rate > 0) {
+            // Price Table formula: PMT = PV * [i * (1 + i)^n] / [(1 + i)^n - 1]
+            installment = financedAmount * (rate * Math.pow(1 + rate, months)) / (Math.pow(1 + rate, months) - 1);
+          } else {
+            installment = financedAmount / months;
+          }
+          
+          form.setValue('installmentValue', Number(installment.toFixed(2)));
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   const onSubmit = (data: z.infer<typeof schema>) => {
     updateMutation.mutate(data);
   };
@@ -58,16 +84,10 @@ export function MotoDetailsView() {
   const safeEntry = watchedValues.entry || 0;
   const safeInstallmentValue = watchedValues.installmentValue || 0;
   const safeTotalInstallments = watchedValues.totalInstallments || 0;
-  const safeInterestRate = watchedValues.interestRate || 0;
 
   const totalFinanced = safeInstallmentValue * safeTotalInstallments;
   const totalPaid = totalFinanced + safeEntry;
-  
-  // Cálculo aproximado do Valor Presente (PV) para estimar os juros totais
-  const i = safeInterestRate / 100;
-  const n = safeTotalInstallments;
-  const pv = i > 0 ? safeInstallmentValue * ((1 - Math.pow(1 + i, -n)) / i) : totalFinanced;
-  const totalInterest = totalFinanced - pv;
+  const totalInterest = totalPaid - safeTotalValue;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
