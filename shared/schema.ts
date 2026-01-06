@@ -16,6 +16,7 @@ export const fixedExpenses = pgTable("fixed_expenses", {
   month: text("month").notNull().default("Jan"), // Added month
   name: text("name").notNull(), // Aluguel, Internet, etc.
   amount: numeric("amount").notNull(),
+  originId: integer("origin_id"), // Track sync from variable expense
 });
 
 // 3. Gastos Variáveis (Variable Expenses)
@@ -24,6 +25,7 @@ export const variableExpenses = pgTable("variable_expenses", {
   month: text("month").notNull(),
   description: text("description").notNull(),
   amount: numeric("amount").notNull(),
+  isSynced: boolean("is_synced").default(false), // Track if synced to fixed
 });
 
 // 4. Meta Economia (Savings Goals)
